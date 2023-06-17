@@ -2,6 +2,8 @@ import java.util.Random;
 import java.util.Scanner;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.FileReader;
+import java.io.BufferedReader;
 
 public class Generals {
     private String name;
@@ -115,7 +117,7 @@ public class Generals {
 
         do {
             // Wykonuje czynność dla Generała 1
-            System.out.println("\nKolej Generała 1: Wybierz czynność (Manewry/Atak/Zakup żołnierzy/Koniec): ");
+            System.out.println("\nKolej Generała 1: Wybierz czynność (Manewry/Atak/Zakup żołnierzy/Zapisz/Wczytaj/Koniec): ");
             choice = scanner.nextLine();
             switch (choice.toLowerCase()) {
                 case "manewry":
@@ -127,6 +129,12 @@ public class Generals {
                 case "zakup żołnierzy":
                     general1.purchaseSoldiers();
                     break;
+                case "zapisz":
+                    saveGame(general1, general2);
+                    break;
+                case "wczytaj":
+                    loadGame(general1, general2);
+                    break;
                 case "koniec":
                     break;
                 default:
@@ -134,7 +142,7 @@ public class Generals {
             }
 
             // Wykonuje czynność dla Generała 2
-            System.out.println("\nKolej Generała 2: Wybierz czynność (Manewry/Atak/Zakup żołnierzy/Koniec): ");
+            System.out.println("\nKolej Generała 2: Wybierz czynność (Manewry/Atak/Zakup żołnierzy/Zapisz/Wczytaj/Koniec): ");
             choice = scanner.nextLine();
             switch (choice.toLowerCase()) {
                 case "manewry":
@@ -146,6 +154,12 @@ public class Generals {
                 case "zakup żołnierzy":
                     general2.purchaseSoldiers();
                     break;
+                case "zapisz":
+                    saveGame(general1, general2);
+                    break;
+                case "wczytaj":
+                    loadGame(general1, general2);
+                    break;
                 case "koniec":
                     break;
                 default:
@@ -154,5 +168,46 @@ public class Generals {
         } while (!choice.equalsIgnoreCase("koniec"));
 
         scanner.close();
+    }
+
+    public static void saveGame(Generals general1, Generals general2) {
+        try {
+            FileWriter writer = new FileWriter("savegame.txt");
+            writer.write(general1.getName() + "," + general1.getGold() + "," + general1.getSoldiers() + "," + general1.getExperience() + "\n");
+            writer.write(general2.getName() + "," + general2.getGold() + "," + general2.getSoldiers() + "," + general2.getExperience() + "\n");
+            writer.close();
+            System.out.println("Gra została zapisana.");
+        } catch (IOException e) {
+            System.out.println("Wystąpił błąd podczas zapisu gry.");
+        }
+    }
+
+    public static void loadGame(Generals general1, Generals general2) {
+        try {
+            FileReader reader = new FileReader("savegame.txt");
+            BufferedReader bufferedReader = new BufferedReader(reader);
+            String line;
+            int lineNumber = 1;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length == 4) {
+                    if (lineNumber == 1) {
+                        general1.setGold(Integer.parseInt(data[1]));
+                        general1.setSoldiers(Integer.parseInt(data[2]));
+                        general1.setExperience(Integer.parseInt(data[3]));
+                    } else if (lineNumber == 2) {
+                        general2.setGold(Integer.parseInt(data[1]));
+                        general2.setSoldiers(Integer.parseInt(data[2]));
+                        general2.setExperience(Integer.parseInt(data[3]));
+                    }
+                }
+                lineNumber++;
+            }
+            bufferedReader.close();
+            reader.close();
+            System.out.println("Gra została wczytana.");
+        } catch (IOException e) {
+            System.out.println("Wystąpił błąd podczas wczytywania gry.");
+        }
     }
 }
